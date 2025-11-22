@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Álbum — Jordhy ❤ Grecia</title>
+<style>
+:root{
+    --bg:#0b0b0b;
+    --accent:#c62828;
+    --accent-2:#ff6b6b;
+    --muted:#bbb;
+    --glass: rgba(255,255,255,0.06);
+    --radius:18px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+    margin:0; background:var(--bg); color:#fff; font-family:Inter, system-ui, Arial; overflow:hidden;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+.app{
+    position:relative; width:100vw; height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+#particles{position:absolute; inset:0; width:100%; height:100%; z-index:0}
+.slider-container{
+    position:relative; width:100%; height:100%; z-index:2; display:flex; align-items:center; justify-content:center;
+}
+.slide{
+    position:absolute; inset:0; opacity:0; display:flex; align-items:center; justify-content:center; transition:opacity .9s ease, transform 1s ease; padding:40px
+}
+.slide.active{opacity:1; transform:translateZ(0)}
+.media-wrap{max-width:1200px; max-height:85vh; width:calc(100% - 120px); display:flex; align-items:center; justify-content:center}
+.media-wrap img, .media-wrap video{width:100%; height:auto; max-height:85vh; border-radius:var(--radius); box-shadow:0 20px 60px rgba(0,0,0,.7); background:linear-gradient(180deg,#111,#000); object-fit:contain}
+.media-wrap video{outline:none}
+.panel{
+    position:absolute; top:50%; transform:translateY(-50%); z-index:3; display:flex; align-items:center; gap:10px
+}
+.panel.left{left:20px}
+.panel.right{right:20px}
+.btn{
+    background: linear-gradient(180deg,var(--accent),var(--accent-2)); border:none; color:white; padding:12px 18px; border-radius:12px; font-weight:600; box-shadow:0 6px 30px rgba(198,40,40,.25); cursor:pointer;
+}
+.ghost{background:var(--glass); border:1px solid rgba(255,255,255,0.06); padding:10px 12px; border-radius:12px; color:var(--muted)}
+.controls{position:absolute; bottom:28px; left:50%; transform:translateX(-50%); z-index:4; display:flex; gap:12px; align-items:center}
+.dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12)}
+.dot.active{background:var(--accent)}
+#intro{position:absolute; inset:0; z-index:6; display:flex; align-items:center; justify-content:center; flex-direction:column; background:linear-gradient(180deg, rgba(0,0,0,0.8), rgba(0,0,0,0.6));}
+.cover{backdrop-filter: blur(6px); border-radius:20px; padding:36px; text-align:center; box-shadow:0 30px 80px rgba(0,0,0,.6); border:1px solid rgba(255,255,255,0.04)}
+.cover h1{font-size:36px;margin:0 0 8px;color:var(--accent)}
+.cover p{color:var(--muted); margin:0 0 20px}
+.topbar{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:5;display:flex;gap:12px;align-items:center}
+.title{font-weight:700; color:#fff}
+@media (max-width:900px){
+    .media-wrap{width:calc(100% - 40px); padding:10px}
+    .cover h1{font-size:28px}
+    .panel.left{left:8px}
+    .panel.right{right:8px}
+}
+.count{font-size:13px;color:var(--muted)}
+.pulse{animation:pulse 2.4s infinite}
+@keyframes pulse{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="app">
+    <canvas id="particles"></canvas>
+    <div class="slider-container" id="slider"></div>
+
+    <div class="panel left">
+        <button class="btn" id="prevBtn">⟨</button>
+    </div>
+    <div class="panel right">
+        <button class="btn" id="nextBtn">⟩</button>
+    </div>
+
+    <div class="controls" id="controls"></div>
+
+    <div class="topbar">
+        <div class="title">Jordhy ❤ Grecia</div>
+        <div style="width:12px"></div>
+        <div class="count" id="countText">0 / 0</div>
+    </div>
+
+    <div id="intro">
+        <div class="cover">
+            <h1>Jordhy &amp; Grecia</h1>
+            <p>Un álbum hecho con todo mi amor. Desliza o usa las flechas para navegar.</p>
+            <div style="display:flex;gap:12px;justify-content:center;margin-top:18px">
+                <button class="btn" id="enterBtn">Entrar</button>
+                <button class="ghost" id="enterNoMusic">Entrar sin música</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop src="media/musica.mp3"></audio>
+</div>
+
+<script>
+const enc = s => s.split('/').map(encodeURIComponent).join('/');
+
+function createSlideElement(file){
+    const div = document.createElement('div');
+    div.className = 'slide';
+    const wrap = document.createElement('div');
+    wrap.className = 'media-wrap';
+
+    const lower = file.toLowerCase();
+    if(lower.endsWith('.mp4') || lower.endsWith('.webm') || lower.endsWith('.mov')){
+        const v = document.createElement('video');
+        v.src = 'media/' + enc(file);
+        v.controls = true;
+        v.preload = 'metadata';
+        v.playsInline = true;
+        v.addEventListener('play', ()=>{ pauseAutoplay(); });
+        v.addEventListener('ended', ()=>{ if(autoplayEnabled) scheduleNext(); });
+        wrap.appendChild(v);
+    } else {
+        const img = document.createElement('img');
+        img.src = 'media/' + enc(file);
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        wrap.appendChild(img);
+    }
+
+    div.appendChild(wrap);
+    return div;
+}
+
+let slides = [], index = 0, autoplayInterval = null, autoplayEnabled = true;
+const AUTOPLAY_MS = 8000;
+
+function showSlide(i){
+    if(slides.length === 0) return;
+    slides.forEach(s => s.classList.remove('active'));
+    index = ((i % slides.length) + slides.length) % slides.length;
+    slides[index].classList.add('active');
+    updateDots();
+    updateCount();
+}
+function nextSlide(){ showSlide(index+1); }
+function prevSlide(){ showSlide(index-1); }
+function updateCount(){ document.getElementById('countText').textContent = `${index+1} / ${slides.length}`; }
+
+function createDots(){
+    const ctr = document.getElementById('controls');
+    ctr.innerHTML = '';
+    slides.forEach((s,i)=>{
+        const d = document.createElement('div'); 
+        d.className='dot';
+        d.addEventListener('click', ()=>{ showSlide(i); resetAutoplay(); });
+        ctr.appendChild(d);
+    });
+    updateDots();
+}
+function updateDots(){
+    document.querySelectorAll('.dot').forEach((d,i)=> d.classList.toggle('active', i===index));
+}
+
+function startAutoplay(){
+    stopAutoplay();
+    autoplayEnabled = true;
+    autoplayInterval = setInterval(()=>{
+        const v = slides[index]?.querySelector('video');
+        if(v && !v.paused) return;
+        nextSlide();
+    }, AUTOPLAY_MS);
+}
+function stopAutoplay(){ if(autoplayInterval) clearInterval(autoplayInterval); autoplayInterval=null; }
+function pauseAutoplay(){ stopAutoplay(); autoplayEnabled=false; }
+function resetAutoplay(){ if(autoplayEnabled) startAutoplay(); }
+function scheduleNext(){ if(autoplayEnabled){ stopAutoplay(); autoplayInterval=setInterval(nextSlide, AUTOPLAY_MS); } }
+
+document.getElementById('nextBtn')?.addEventListener('click', ()=>{ nextSlide(); resetAutoplay(); });
+document.getElementById('prevBtn')?.addEventListener('click', ()=>{ prevSlide(); resetAutoplay(); });
+
+document.addEventListener('keydown', e=>{
+    if(e.key==='ArrowRight'){ nextSlide(); resetAutoplay(); }
+    if(e.key==='ArrowLeft'){ prevSlide(); resetAutoplay(); }
+    if(e.code==='Space'){ const v=slides[index]?.querySelector('video'); if(v){v.paused?v.play():v.pause();} }
+});
+
+let touchStartX=0, touchEndX=0;
+const sliderEl = document.getElementById('slider');
+sliderEl.addEventListener('touchstart', e=>{ touchStartX = e.changedTouches[0].screenX; });
+sliderEl.addEventListener('touchend', e=>{
+    touchEndX = e.changedTouches[0].screenX;
+    if(touchEndX < touchStartX-40) { nextSlide(); resetAutoplay(); }
+    if(touchEndX > touchStartX+40) { prevSlide(); resetAutoplay(); }
+});
+
+// ---------- Particles ----------
+(function(){
+    const canvas = document.getElementById('particles');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let W=canvas.width=innerWidth, H=canvas.height=innerHeight;
+    window.addEventListener('resize', ()=>{ W=canvas.width=innerWidth; H=canvas.height=innerHeight; });
+    const hearts=[];
+    function rand(min,max){return Math.random()*(max-min)+min;}
+    function makeHeart(){return {x:rand(0,W),y:H+20,vx:rand(-0.6,0.6),vy:rand(-6,-2),size:rand(6,16),alpha:rand(0.6,1),rot:rand(0,Math.PI*2)};}
+    for(let i=0;i<25;i++) hearts.push(makeHeart());
+    function drawHeart(x,y,s,a,r){ctx.save();ctx.translate(x,y);ctx.rotate(r);ctx.scale(s/16,s/16);ctx.beginPath();ctx.moveTo(0,0);ctx.bezierCurveTo(-8,-16,-28,-10,-28,0);ctx.bezierCurveTo(-28,18,-8,28,0,40);ctx.bezierCurveTo(8,28,28,18,28,0);ctx.bezierCurveTo(28,-10,8,-16,0,0);ctx.closePath();ctx.fillStyle=`rgba(198,40,40,${a})`;ctx.fill();ctx.restore();}
+    function loop(){ctx.clearRect(0,0,W,H); hearts.forEach((h,i)=>{h.x+=h.vx;h.y+=h.vy;h.vy+=0.03;h.rot+=0.02;if(h.y<-40||h.x<-60||h.x>W+60) hearts[i]=makeHeart(); drawHeart(h.x,h.y,h.size,h.alpha,h.rot);}); requestAnimationFrame(loop);}
+    loop();
+})();
+
+// ---------- Entrar botones ----------
+    document.addEventListener('DOMContentLoaded', () => {
+        const enterBtn = document.getElementById('enterBtn');
+        const enterNoMusic = document.getElementById('enterNoMusic');
+        const intro = document.getElementById('intro');
+        const bgMusic = document.getElementById('bgMusic');
+
+        enterBtn?.addEventListener('click', () => {
+            intro.style.display = 'none';
+            bgMusic.play().catch(()=>{});
+        });
+
+        enterNoMusic?.addEventListener('click', () => {
+            intro.style.display = 'none';
+        });
+    });
+
+// ---------- Generar lista de archivos ----------
+(function(){
+    const slider = document.getElementById('slider');
+    const fotos=[], videos=[];
+    for(let i=38;i>=1;i--){ fotos.push(i===38?'foto_38.jpg':`foto ${i}.jpg`); }
+    for(let i=41;i>=1;i--){ videos.push(`video ${i}.mp4`); }
+    let fi=0, vi=0;
+    const files=[];
+    while(fi<fotos.length || vi<videos.length){
+        if(fi<fotos.length) files.push(fotos[fi++]);
+        if(vi<videos.length) files.push(videos[vi++]);
+    }
+    files.forEach(file=>{ slider.appendChild(createSlideElement(file)); });
+    slides = Array.from(document.querySelectorAll('.slide'));
+    showSlide(0);
+    createDots();
+    startAutoplay();
+})();
+</script>
+</body>
+</html>
