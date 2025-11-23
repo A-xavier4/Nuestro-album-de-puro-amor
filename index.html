@@ -135,9 +135,20 @@
     }
 
     @media (max-width: 600px) {
-        .slider {
+        .slide {
             flex: 0 0 100%;
             max-width: 100%;
+            margin: 0;
+        }
+        .slider {
+            gap: 10px;
+            padding: 0;
+        }
+        .media-wrap {
+            max-height: 380px;
+        }
+        img, video {
+            max-height: 380px;
         }
     }
 
@@ -276,11 +287,11 @@ slides.forEach(obj=>{
 let currentIndex = 0;
 
 function updateSlider(){
-    let cardW = slider.children[0].offsetWidth + 20;
+    let cardW = slider.children[0].getBoundingClientRect().width;
     slider.style.transform = `translateX(-${currentIndex * cardW}px)`;
     pauseAll(null); // 💗 Pausa el video anterior
 }
-
+window.addEventListener("resize", updateSlider);
 document.getElementById("btn-left").onclick = () => {
     if(currentIndex > 0){
         currentIndex--;
