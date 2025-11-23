@@ -40,8 +40,9 @@
     }
 
     .slide {
-        flex: 0 0 80%;
-        max-width: 650px;
+        flex: 0 0 90%;
+        max-width: 500px;
+        margin: 0 auto;
         border-radius: 20px;
         overflow: hidden;
         background: rgba(255, 255, 255, 0.08);
@@ -132,6 +133,14 @@
         object-fit: contain;
         border-radius: 14px;
     }
+
+    @media (max-width: 600px) {
+        .slider {
+            padding-left: 5%;
+        }
+    }
+
+    
 </style>
 </head>
 <body>
