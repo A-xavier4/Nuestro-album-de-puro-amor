@@ -1,477 +1,289 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Álbum Romántico Premium</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Álbum Rojo Elegante</title>
+
 <style>
-:root{
-    --bg1:#0f1724;
-    --bg2:#172033;
-    --accent:#c3568a;
-    --muted:#cfcfd6;
-    --radius:18px;
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-    margin:0;
-    background: linear-gradient(180deg,var(--bg1),var(--bg2));
-    font-family: Inter, system-ui, Arial;
-    color:#fff;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    overflow:hidden;
-}
+    body {
+        margin: 0;
+        background: linear-gradient(135deg, #02ffee, #04fdf5, #03ffcd);
+        font-family: "Segoe UI", sans-serif;
+        color: #fff;
+        overflow-x: hidden;
+    }
 
-/* floating subtle animated lights in background */
-.floating{
-    position: absolute;
-    width: 160vmax;
-    height: 160vmax;
-    top: 50%; left: 50%;
-    transform: translate(-50%,-50%);
-    filter: blur(80px);
-    opacity: .38;
-    pointer-events: none;
-    z-index:0;
-    background: radial-gradient(circle at 30% 30%, rgba(195,86,138,.12) 0%, transparent 45%),
-                radial-gradient(circle at 70% 70%, rgba(86,135,195,.10) 0%, transparent 40%);
-    animation: spin 36s linear infinite;
-}
-@keyframes spin{ from{ transform: translate(-50%,-50%) rotate(0deg);} to{ transform: translate(-50%,-50%) rotate(360deg);} }
+    .title {
+        text-align: center;
+        padding: 20px 10px;
+        font-size: 28px;
+        font-weight: bold;
+        text-shadow: 0 0 12px #f04343;
+    }
 
-/* header/quote */
-.header {
-    position: relative;
-    z-index:4;
-    text-align:center;
-    padding-top:28px;
-    padding-bottom:2px;
-}
-.title{
-    font-size:30px;
-    font-weight:700;
-    letter-spacing:1px;
-    margin:0;
-    color: #fff;
-    text-shadow: 0 6px 30px rgba(195,86,138,.08);
-}
-.quote{
-    margin:6px 12px 18px 12px;
-    color:var(--muted);
-    font-style:italic;
-    opacity:.95;
-    font-size:15px;
-}
+    /* ---- GALERÍA ---- */
+    .gallery-container {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        padding-bottom: 40px;
+        display: flex;
+        justify-content: center;
+    }
 
-/* gallery area */
-.app{
-    position:relative;
-    z-index:3;
-    width:100vw;
-    height:calc(100vh - 120px);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px 0 40px;
-}
+    .slider {
+        display: flex;
+        gap: 20px;
+        transition: transform .6s ease;
+        padding: 10px 20px;
+    }
 
-/* slider container */
-.gallery{
-    width:100%;
-    max-width:1200px;
-    margin:0 auto;
-    position:relative;
-}
+    .slide {
+        flex: 0 0 80%;
+        max-width: 650px;
+        border-radius: 20px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(222, 49, 241, 0.4);
+        box-shadow: 0 0 20px rgba(222, 49, 241, 0.4);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-/* slides row - scroll snapping disabled for buttons nav (we'll animate transform) */
-.slides{
-    display:flex;
-    gap:28px;
-    align-items:center;
-    transition: transform .6s cubic-bezier(.25,.1,.25,1);
-    padding: 0 28px;
-    will-change: transform;
-}
+    .media-wrap {
+        width: 100%;
+        height: auto;
+        max-height: 420px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        background: #000;
+        position: relative;
+    }
 
-/* card */
-.card{
-    min-width: 78%;
-    max-width: 78%;
-    height: 74vh;
-    border-radius: var(--radius);
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    box-shadow: 0 30px 80px rgba(0,0,0,.6);
-    overflow:hidden;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    position:relative;
-    backdrop-filter: blur(6px);
-    border: 1px solid rgba(255,255,255,0.03);
-}
-@media (max-width:900px){
-    .card{ min-width: 92%; max-width:92%; height:65vh; }
-}
+    img, video {
+        width: 100%;
+        height: auto;
+        max-height: 420px;
+        object-fit: contain;
+        cursor: pointer;
+    }
 
-/* media inside card */
-.media-wrap{
-    width:100%;
-    height:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    position:relative;
-    padding:18px;
-}
-.media-wrap img,
-.media-wrap video{
-    width: auto;
-    max-width:100%;
-    height:100%;
-    max-height:100%;
-    object-fit: contain; /* show complete media */
-    border-radius: 12px;
-}
+    /* ---- BOTONES ---- */
+    .btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        padding: 14px 18px;
+        background: rgba(255, 0, 0, 0.3);
+        backdrop-filter: blur(5px);
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 22px;
+        color: white;
+        user-select: none;
+        box-shadow: 0 0 10px rgba(255, 0, 0, .8);
+        transition: .25s ease;
+    }
 
-/* shield to absorb first touch */
-.video-shield{
-    position:absolute;
-    inset:0;
-    z-index:6;
-}
+    .btn:hover {
+        background: rgba(0, 255, 234, 0.5);
+        transform: translateY(-50%) scale(1.1);
+    }
 
-/* nav buttons (left/right) */
-.panel{
-    position:absolute;
-    top:50%;
-    transform:translateY(-50%);
-    z-index:5;
-}
-.panel.left{ left:18px; }
-.panel.right{ right:18px; }
-.btn{
-    background: linear-gradient(180deg,var(--accent), #7a3b6f);
-    border:none;
-    color:#fff;
-    padding:12px 16px;
-    border-radius:12px;
-    font-weight:700;
-    cursor:pointer;
-    box-shadow:0 10px 30px rgba(0,0,0,.5);
-    transition: transform .12s ease, box-shadow .12s ease;
-}
-.btn:active{ transform: translateY(1px); }
-.btn:focus{ outline: none; }
+    #btn-left { left: 10px; }
+    #btn-right { right: 10px; }
 
-/* controls (dots) */
-.controls{
-    position: absolute;
-    left:50%;
-    transform:translateX(-50%);
-    bottom:18px;
-    display:flex;
-    gap:10px;
-    z-index:6;
-}
-.dot{ width:10px; height:10px; border-radius:50%; background: rgba(255,255,255,.12); }
-.dot.active{ background: var(--accent); transform: scale(1.25); box-shadow:0 6px 16px rgba(195,86,138,.18); }
+    /* ---- LIGHTBOX ---- */
+    .lightbox {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .85);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+        opacity: 0;
+        pointer-events: none;
+        transition: .3s ease;
+    }
 
-/* lightbox (fullscreen viewer) */
-.lightbox{
-    position:fixed;
-    inset:0;
-    background: rgba(6,8,12,0.92);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:9999;
-    opacity:0;
-    pointer-events:none;
-    transition: opacity .26s ease;
-}
-.lightbox.active{ opacity:1; pointer-events:all; }
-.lightbox-inner{
-    width:95%;
-    max-width:1200px;
-    max-height:95vh;
-    position:relative;
-}
-.lightbox-media{
-    width:100%;
-    height:100%;
-    border-radius:14px;
-    object-fit:contain;
-    display:block;
-    background:#000;
-}
-.lb-btn{
-    position:absolute;
-    top:50%;
-    transform:translateY(-50%);
-    background: rgba(255,255,255,0.06);
-    border:none;
-    color:#fff;
-    padding:12px 14px;
-    border-radius:10px;
-    cursor:pointer;
-    z-index:10;
-}
-.lb-prev{ left: -70px; }
-.lb-next{ right: -70px; }
-.lb-close{ position:absolute; right: -12px; top:-12px; background: transparent; font-size:22px; padding:8px 10px; }
+    .lightbox.active {
+        opacity: 1;
+        pointer-events: all;
+    }
 
-/* responsive adjustments for lb buttons */
-@media (max-width:900px){
-    .lb-prev, .lb-next { left: 12px; right:12px; top: auto; bottom: 16px; transform:none; }
-    .lb-prev{ left: 16px; } .lb-next{ right: 16px; }
-}
+    .lightbox-content {
+        max-width: 85%;
+        max-height: 85%;
+        border-radius: 14px;
+        box-shadow: 0 0 20px rgb(0, 255, 166);
+    }
 
-/* small helper */
-.hidden{ display:none !important; }
+    .lightbox img,
+    .lightbox video {
+        width: 100%;
+        height: auto;
+        max-height: 85vh;
+        object-fit: contain;
+        border-radius: 14px;
+    }
 </style>
 </head>
 <body>
 
-<div class="floating" aria-hidden="true"></div>
+<div class="title">Nuestro Álbum 💗</div>
 
-<div class="header">
-    <div class="title">Nuestro Álbum — Jordhy ❤ Grecia</div>
-    <div class="quote">"Cada recuerdo tuyo convierte cualquier día en mi favorito." — Para ti, Grecia</div>
+<div class="gallery-container">
+    <div id="slider" class="slider"></div>
+
+    <div id="btn-left" class="btn">❮</div>
+    <div id="btn-right" class="btn">❯</div>
 </div>
 
-<div class="app">
-    <div class="gallery">
-        <div class="panel left"><button id="prevBtn" class="btn">⟨</button></div>
-        <div class="panel right"><button id="nextBtn" class="btn">⟩</button></div>
-
-        <div class="slides" id="slidesRow" role="list"></div>
-
-        <div class="controls" id="controlsRow"></div>
-    </div>
-</div>
-
-<!-- Lightbox -->
-<div id="lightbox" class="lightbox" aria-hidden="true">
-    <div class="lightbox-inner" id="lightboxInner">
-        <button id="lbClose" class="lb-close" title="Cerrar">✕</button>
-        <button id="lbPrev" class="lb-btn lb-prev" title="Anterior">❮</button>
-        <button id="lbNext" class="lb-btn lb-next" title="Siguiente">❯</button>
-        <div id="lightboxMediaWrapper"></div>
-    </div>
+<!-- LIGHTBOX -->
+<div id="lightbox" class="lightbox">
+    <div id="lightboxContent" class="lightbox-content"></div>
 </div>
 
 <script>
-/* ---------- Helpers ---------- */
-const enc = s => s.split('/').map(encodeURIComponent).join('/');
-const slidesRow = document.getElementById('slidesRow');
-const controlsRow = document.getElementById('controlsRow');
+/* -----------------------------
+   CARGA AUTÓMATICA DE ARCHIVOS
+----------------------------- */
+const slider = document.getElementById("slider");
+let slides = [];
 
-function pauseAllExcept(except){
-    document.querySelectorAll('video').forEach(v=>{
-        try{ if(v !== except) v.pause(); }catch(e){}
+/* Fotos */
+let fotos = [];
+fotos.push("foto_38.jpg");
+for(let i = 37; i >= 1; i--){
+    fotos.push(`foto ${i}.jpg`);
+}
+
+/* Videos */
+let videos = [];
+videos.push("video 41.mp4");
+for(let i = 40; i >= 1; i--){
+    videos.push(`video ${i}.mp4`);
+}
+
+/* Alternarlas */
+let max = Math.max(fotos.length, videos.length);
+let indexFoto = 0, indexVideo = 0;
+
+for(let i=0;i<max;i++){
+    if(indexFoto < fotos.length){
+        slides.push({type:"foto",file:fotos[indexFoto]});
+        indexFoto++;
+    }
+    if(indexVideo < videos.length){
+        slides.push({type:"video",file:videos[indexVideo]});
+        indexVideo++;
+    }
+}
+
+/* -----------------------------
+   PAUSAR TODOS LOS VIDEOS
+----------------------------- */
+function pauseAll(except){
+    document.querySelectorAll("video").forEach(v=>{
+        if(v !== except) v.pause();
     });
 }
 
-/* ---------- Build file lists (interleaved starting from foto_38 & video 41) ---------- */
-const fotos = [];
-fotos.push('foto_38.jpg');
-for(let i=37;i>=1;i--) fotos.push(`foto ${i}.jpg`);
+/* -----------------------------
+   LIGHTBOX (NO AGRANDA MUCHO)
+----------------------------- */
+function openLightbox(element){
+    let box = document.getElementById("lightbox");
+    let content = document.getElementById("lightboxContent");
+    
+    content.innerHTML = "";
+    
+    let clone = element.cloneNode(true);
+    clone.style.maxHeight = "85vh"; // 💗 No se agranda demasiado
+    clone.controls = element.tagName === "VIDEO";
 
-const videos = [];
-videos.push('video 41.mp4');
-for(let i=40;i>=1;i--) videos.push(`video ${i}.mp4`);
-
-const files = [];
-let fi=0, vi=0;
-while(fi < fotos.length || vi < videos.length){
-    if(fi < fotos.length) files.push({type:'foto', file: fotos[fi++]});
-    if(vi < videos.length) files.push({type:'video', file: videos[vi++]});
+    box.classList.add("active");
+    content.appendChild(clone);
 }
 
-/* ---------- Create slides & dots ---------- */
-let slideElements = [];
-files.forEach((f, idx)=>{
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.setAttribute('role','listitem');
+document.getElementById("lightbox").addEventListener("click", ()=>{
+    document.getElementById("lightbox").classList.remove("active");
+    pauseAll(null);
+});
 
-    const wrap = document.createElement('div');
-    wrap.className = 'media-wrap';
+/* -----------------------------
+   CREAR SLIDES
+----------------------------- */
+slides.forEach(obj=>{
+    let slide = document.createElement("div");
+    slide.className = "slide";
 
-    if(f.type === 'foto'){
-        const img = document.createElement('img');
-        img.src = 'media/' + enc(f.file);
-        img.alt = `Foto ${idx+1}`;
-        img.className = 'media';
-        img.addEventListener('click', ()=> openLightbox(idx));
+    let wrap = document.createElement("div");
+    wrap.className = "media-wrap";
+
+    if(obj.type === "foto"){
+        let img = document.createElement("img");
+        img.src = "media/" + obj.file;
+        img.onclick = () => openLightbox(img);
+
         wrap.appendChild(img);
     } else {
-        const vid = document.createElement('video');
-        vid.src = 'media/' + enc(f.file);
-        vid.controls = true;
-        vid.preload = 'metadata';
-        vid.playsInline = true;
-        vid.className = 'media';
-        // prevent slider from receiving this initial touch: add shield
-        const shield = document.createElement('div');
-        shield.className = 'video-shield';
-        shield.addEventListener('click', (e)=>{
-            e.stopPropagation();
-            if(shield.parentNode) shield.parentNode.removeChild(shield);
-            vid.play().catch(()=>{});
-            pauseAllExcept(vid);
-        }, {passive:false});
-        // clicking video opens fullscreen/lightbox
-        vid.addEventListener('click', ()=> openLightbox(idx));
-        // when playing, pause other videos
-        vid.addEventListener('play', ()=> pauseAllExcept(vid));
-        wrap.style.position='relative';
-        wrap.appendChild(vid);
+        let v = document.createElement("video");
+        v.src = "media/" + obj.file;
+        v.controls = true;
+        v.preload = "metadata";
+        v.playsInline = true;
+
+        let shield = document.createElement("div");
+        shield.style.position="absolute";
+        shield.style.inset="0";
+
+        shield.onclick = ()=>{
+            shield.remove();
+            v.play();
+            pauseAll(v);
+        };
+
+        v.onclick = ()=> openLightbox(v);
+
+        wrap.appendChild(v);
         wrap.appendChild(shield);
     }
 
-    card.appendChild(wrap);
-    slidesRow.appendChild(card);
-    slideElements.push(card);
-
-    // dot
-    const dot = document.createElement('div');
-    dot.className = 'dot';
-    dot.addEventListener('click', ()=> { goTo(idx); });
-    controlsRow.appendChild(dot);
+    slide.appendChild(wrap);
+    slider.appendChild(slide);
 });
 
-/* ---------- Slider navigation (card-by-card) ---------- */
-let current = 0;
-const cardGap = 28;
-function refreshLayout(){
-    // ensure current index valid
-    if(current < 0) current = 0;
-    if(current >= slideElements.length) current = slideElements.length -1;
-    const cardW = slideElements[0]?.offsetWidth || (window.innerWidth * 0.78);
-    const translate = current * (cardW + cardGap);
-    slidesRow.style.transform = `translateX(-${translate}px)`;
-    updateDots();
-}
-function updateDots(){
-    Array.from(controlsRow.children).forEach((d,i)=> d.classList.toggle('active', i===current));
-}
-function goTo(i){
-    current = i;
-    refreshLayout();
-    pauseAllExcept(null);
-}
-document.getElementById('prevBtn').addEventListener('click', ()=>{
-    if(current > 0) { current--; refreshLayout(); }
-});
-document.getElementById('nextBtn').addEventListener('click', ()=>{
-    if(current < slideElements.length-1) { current++; refreshLayout(); }
-});
+/* -----------------------------
+   BOTONES + PAUSA AL CAMBIAR
+----------------------------- */
+let currentIndex = 0;
 
-// handle window resize
-window.addEventListener('resize', refreshLayout);
-refreshLayout();
+function updateSlider(){
+    let cardW = slider.children[0].offsetWidth + 20;
+    slider.style.transform = `translateX(-${currentIndex * cardW}px)`;
+    pauseAll(null); // 💗 Pausa el video anterior
+}
 
-/* allow swipe gestures on slidesRow (but ignore if touching video controls) */
-let txStart = 0;
-slidesRow.addEventListener('touchstart', e=>{
-    txStart = e.changedTouches[0].screenX;
-}, {passive:true});
-slidesRow.addEventListener('touchend', e=>{
-    const txEnd = e.changedTouches[0].screenX;
-    const diff = txEnd - txStart;
-    if(Math.abs(diff) < 40) return;
-    // detect if the touch target is a video control or video element - skip if so
-    const targetTag = e.changedTouches[0].target.nodeName.toLowerCase();
-    if(targetTag === 'video' || e.changedTouches[0].target.closest && e.changedTouches[0].target.closest('video')) return;
-    if(diff > 0){
-        if(current>0){ current--; refreshLayout(); }
-    } else {
-        if(current < slideElements.length-1){ current++; refreshLayout(); }
+document.getElementById("btn-left").onclick = () => {
+    if(currentIndex > 0){
+        currentIndex--;
+        updateSlider();
     }
-}, {passive:true});
+};
 
-/* ---------- Lightbox (fullscreen viewer) ---------- */
-const lb = document.getElementById('lightbox');
-const lbWrapper = document.getElementById('lightboxMediaWrapper');
-const lbPrev = document.getElementById('lbPrev');
-const lbNext = document.getElementById('lbNext');
-const lbClose = document.getElementById('lbClose');
-
-function openLightbox(index){
-    current = index;
-    refreshLayout();
-    lbWrapper.innerHTML = '';
-    const item = files[index];
-    if(item.type === 'foto'){
-        const img = document.createElement('img');
-        img.src = 'media/' + enc(item.file);
-        img.className = 'lightbox-media';
-        lbWrapper.appendChild(img);
-    } else {
-        const v = document.createElement('video');
-        v.src = 'media/' + enc(item.file);
-        v.controls = true;
-        v.autoplay = true;
-        v.playsInline = true;
-        v.className = 'lightbox-media';
-        lbWrapper.appendChild(v);
-        // reduce other playing videos
-        pauseAllExcept(v);
+document.getElementById("btn-right").onclick = () => {
+    if(currentIndex < slider.children.length - 1){
+        currentIndex++;
+        updateSlider();
     }
-    lb.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-function closeLightbox(){
-    lb.classList.remove('active');
-    lbWrapper.innerHTML = '';
-    document.body.style.overflow = '';
-    // pause in-page videos
-    pauseAllExcept(null);
-}
-function lbNextFn(){
-    current = (current + 1) % files.length;
-    openLightbox(current);
-}
-function lbPrevFn(){
-    current = (current - 1 + files.length) % files.length;
-    openLightbox(current);
-}
-
-lbNext.addEventListener('click', (e)=>{ e.stopPropagation(); lbNextFn(); });
-lbPrev.addEventListener('click', (e)=>{ e.stopPropagation(); lbPrevFn(); });
-lbClose.addEventListener('click', (e)=>{ e.stopPropagation(); closeLightbox(); });
-
-// clicking outside content closes
-lb.addEventListener('click', (e)=>{
-    if(e.target === lb) closeLightbox();
-});
-
-// keyboard navigation
-document.addEventListener('keydown', (e)=>{
-    if(lb.classList.contains('active')){
-        if(e.key === 'ArrowRight') lbNextFn();
-        if(e.key === 'ArrowLeft') lbPrevFn();
-        if(e.key === 'Escape') closeLightbox();
-    } else {
-        if(e.key === 'ArrowRight') { if(current < slideElements.length-1){ current++; refreshLayout(); } }
-        if(e.key === 'ArrowLeft') { if(current > 0){ current--; refreshLayout(); } }
-    }
-});
-
-// clicking on left/right in fullscreen area (wrap) also next
-lbWrapper.addEventListener('click', (e)=>{
-    // if clicking video controls we don't want to advance; detect tag
-    const tag = e.target.tagName.toLowerCase();
-    if(tag === 'video' || e.target.closest && e.target.closest('video')) return;
-    // advance
-    lbNextFn();
-});
-
-/* ensure initial layout after images load (to compute widths) */
-window.addEventListener('load', ()=>{ setTimeout(refreshLayout,200); });
+};
 </script>
 
 </body>
